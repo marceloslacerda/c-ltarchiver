@@ -12,6 +12,12 @@
 #include "schifra_reed_solomon_block.hpp"
 #include "schifra_error_processes.hpp"
 
+/*std::uintmax_t get_file_size(std::string path) {
+   std::filesystem::path filepath(path);
+   return std::filesystem::file_size(filepath);
+
+}*/
+
 int main(int argc, char *argv[])
 {
    /* Finite Field Parameters */
@@ -39,6 +45,7 @@ int main(int argc, char *argv[])
    std::ofstream outputFile(argv[2], std::ios_base::binary);
    std::ifstream eccFile(argv[3], std::ios_base::binary);
    std::ofstream eccOutputFile(argv[4], std::ios_base::binary);
+   //std::uintmax_t filesize = get_file_size(std::string(argv));
 
    /* Instantiate Finite Field and Generator Polynomials */
    const schifra::galois::field field(field_descriptor,
@@ -67,11 +74,15 @@ int main(int argc, char *argv[])
    /* Instantiate RS Block For Codec */
    schifra::reed_solomon::block<code_length,fec_length> block;
    bool end_of_file = false;
+   std::uintmax_t bytes_read = 0;
+   std::streamsize last_read = 0;
    while (!end_of_file) {
       block.reset();
       inputFile.read(buffer, data_length);
+      last_read = inputFile.gcount();
+      bytes_read += last_read;
       if (!inputFile) {
-         for(size_t i = inputFile.gcount() ; i < data_length; i++) {
+         for(size_t i = last_read ; i < data_length; i++) {
             buffer[i] = 0; // clear part of the buffer that was not read
          }
          end_of_file = true;
@@ -91,9 +102,7 @@ int main(int argc, char *argv[])
          block.data[i] = static_cast<schifra::galois::field_symbol>(ecc_buffer[i - data_length])  & 0xFF;
       }
 
-      block.data_to_string(buffer_str);
       /* Decode */
-
       if (!decoder.decode(block))
       {
          std::cerr << "Error - Critical decoding failure! "
@@ -108,7 +117,7 @@ int main(int argc, char *argv[])
       block.fec_to_string(ecc_buffer_str);
       
       /* Write buffers to respective files */
-      outputFile.write(buffer_str.data(), data_length);
+      outputFile.write(buffer_str.data(), last_read);
       eccOutputFile.write(ecc_buffer_str.data(), fec_length);
    }
    
