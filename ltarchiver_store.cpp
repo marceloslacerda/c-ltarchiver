@@ -12,13 +12,6 @@
 #include "schifra_reed_solomon_block.hpp"
 #include "schifra_error_processes.hpp"
 
-void print_char_array(const char* array, int size) {
-   for(int i=0; i< size; i++) {
-      std::cout << std::setfill('0') << std::setw(2) << std::hex << (int)array[i] << " ";
-   }
-   std::cout << std::endl;
-}
-
 int main(int argc, char *argv[])
 {
    /* Finite Field Parameters */
@@ -63,7 +56,6 @@ int main(int argc, char *argv[])
 
    /* Instantiate Encoder and Decoder (Codec) */
    typedef schifra::reed_solomon::encoder<code_length,fec_length,data_length> encoder_t;
-   //typedef schifra::reed_solomon::decoder<code_length,fec_length,data_length> decoder_t;
 
    const encoder_t encoder(field, generator_polynomial);
    std::cout << "Starting encoding" << std::endl;
@@ -80,7 +72,6 @@ int main(int argc, char *argv[])
          }
          end_of_file = true;
       }
-      //std::cout << "Buffer contents before encoding " << buffer << std::endl;
       /* Transform message into Reed-Solomon encoded codeword */
       if (!encoder.encode(std::string(buffer, data_length), block))
       {
@@ -90,33 +81,10 @@ int main(int argc, char *argv[])
       } else {
          // write block data into ecc
          block.fec_to_string(ecc_code);
-         /*std::cout << "[";
-         for(size_t i = 0; i< fec_length; i++) {
-            std::cout << (static_cast<int>(ecc_code[i]) & 0xFF) << ", ";
-         }
-         std::cout << "]" << std::endl;*/
          eccFile.write(ecc_code.data(), fec_length);
          std::string buff_str(buffer, data_length);
-         //schifra::reed_solomon::block<code_length,fec_length> block_tmp(buff_str, ecc_code);
-         /*const decoder_t decoder(field, generator_polynomial_index);
-         if (!decoder.decode(block))
-         {
-            std::cerr << "Error - Critical encoding failure! "
-                  << "Msg: " << block.error_as_string()  << std::endl;
-            return 1;
-         } else {
-            block.data_to_string(buff_str);
-            std::cout << "Restored message " << buff_str << std::endl;
-            std::cout << "Block contents " << block << std::endl;
-         }*/
-         //print_char_array(buffer, data_length);
-         //print_char_array(ecc_code.data(), fec_length);
       }
    }
-   /*std::cout << "Encoder Parameters [" << encoder_t::trait::code_length << ","
-                                       << encoder_t::trait::data_length << ","
-                                       << encoder_t::trait::fec_length  << "]" << std::endl;*/
-
    std::cout << "Success!" << std::endl;
    inputFile.close();
    outputFile.flush();

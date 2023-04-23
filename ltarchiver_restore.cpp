@@ -12,14 +12,6 @@
 #include "schifra_reed_solomon_block.hpp"
 #include "schifra_error_processes.hpp"
 
-void print_char_array(const char* array, int size) {
-   for(int i=0; i< size; i++) {
-      std::cout << std::setfill('0') << std::setw(2) << std::hex << (int)array[i] << " ";
-   }
-   std::cout << std::endl;
-}
-
-
 int main(int argc, char *argv[])
 {
    /* Finite Field Parameters */
@@ -75,9 +67,6 @@ int main(int argc, char *argv[])
    /* Instantiate RS Block For Codec */
    schifra::reed_solomon::block<code_length,fec_length> block;
    bool end_of_file = false;
-   /*std::cout << "Decoder Parameters [" << decoder_t::trait::code_length << ","
-                                       << decoder_t::trait::data_length << ","
-                                       << decoder_t::trait::fec_length  << "]" << std::endl;*/
    while (!end_of_file) {
       block.reset();
       inputFile.read(buffer, data_length);
@@ -87,7 +76,6 @@ int main(int argc, char *argv[])
          }
          end_of_file = true;
       }
-      //std::cout << "Read from the input file '" << buffer << "'" << std::endl;
       /* Read ecc */
       eccFile.read(ecc_buffer, fec_length);
       if (!eccFile && inputFile) {
@@ -96,21 +84,14 @@ int main(int argc, char *argv[])
       }
 
       /* Transfer data to block*/
-      //std::cout << "[";
       for(size_t i =0; i<data_length; i++) {
          block.data[i] = static_cast<schifra::galois::field_symbol>(buffer[i])  & 0xFF;
-         //std::cout << block.data[i] << ", ";
       }
-      //std::cout << "]" << std::endl;
-      //std::cout << "[";
       for(size_t i =data_length; i<code_length; i++) {
          block.data[i] = static_cast<schifra::galois::field_symbol>(ecc_buffer[i - data_length])  & 0xFF;
-         //std::cout << block.data[i] << ", ";
       }
-      //std::cout << "]" << std::endl;
 
       block.data_to_string(buffer_str);
-      //std::cout << "Read from the block structure before decoding '" << buffer_str << "'" << std::endl;
       /* Decode */
 
       if (!decoder.decode(block))
@@ -125,8 +106,7 @@ int main(int argc, char *argv[])
 
       block.data_to_string(buffer_str);
       block.fec_to_string(ecc_buffer_str);
-      //std::cout << "Read from the block structure after decoding '" << buffer_str << "'" << std::endl;
-
+      
       /* Write buffers to respective files */
       outputFile.write(buffer_str.data(), data_length);
       eccOutputFile.write(ecc_buffer_str.data(), fec_length);
