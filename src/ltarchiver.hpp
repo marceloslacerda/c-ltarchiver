@@ -5,6 +5,8 @@
 #include "schifra_reed_solomon_decoder.hpp"
 #include "schifra_reed_solomon_block.hpp"
 #include "schifra_error_processes.hpp"
+#include <cstdint>
+#include <filesystem>
 
 namespace ltarchiver
 {
@@ -37,4 +39,9 @@ namespace ltarchiver
         }
         return true;
     }
+}
+
+std::uintmax_t get_file_size(std::string path) {
+   std::filesystem::path filepath(path);
+   return std::filesystem::file_size(filepath);
 }

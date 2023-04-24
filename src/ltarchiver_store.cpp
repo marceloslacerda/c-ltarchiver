@@ -32,11 +32,18 @@ int main(int argc, char *argv[])
    /* Instantiate RS Block For Codec */
    schifra::reed_solomon::block<ltarchiver::code_length,ltarchiver::fec_length> block;
    bool end_of_file = false;
+   double bytes_read = 0;
+   double file_size = get_file_size(std::string(argv[1]));
+   uint last_percent = 0;
+   std::streamsize last_read = 0;
+
    while (!end_of_file) {
       inputFile.read(buffer, ltarchiver::data_length);
-      outputFile.write(buffer, inputFile.gcount());
+      last_read = inputFile.gcount();
+      bytes_read += last_read;
+      outputFile.write(buffer, last_read);
       if (!inputFile) {
-         for(size_t i = inputFile.gcount() ; i < ltarchiver::data_length; i++) {
+         for(size_t i = last_read ; i < ltarchiver::data_length; i++) {
             buffer[i] = 0x0; // clear part of the buffer that was not read
          }
          end_of_file = true;
@@ -52,6 +59,10 @@ int main(int argc, char *argv[])
          block.fec_to_string(ecc_code);
          eccFile.write(ecc_code.data(), ltarchiver::fec_length);
          std::string buff_str(buffer, ltarchiver::data_length);
+      }
+      if((bytes_read / file_size)*100 > last_percent) {
+         std::cout << "" << last_percent << "%" << std::endl;
+         last_percent++;
       }
    }
    std::cout << "Success!" << std::endl;

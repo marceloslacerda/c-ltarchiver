@@ -6,12 +6,6 @@
 
 #include "ltarchiver.hpp"
 
-/*std::uintmax_t get_file_size(std::string path) {
-   std::filesystem::path filepath(path);
-   return std::filesystem::file_size(filepath);
-
-}*/
-
 int main(int argc, char *argv[])
 {
    char * buffer = new char[ltarchiver::data_length];

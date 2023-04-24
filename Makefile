@@ -1,7 +1,7 @@
 COMPILER         = -c++
 OPTIMIZATION_OPT = -O3
-OPTIONS          =  -Isrc/schifra -Isrc/ -ansi -std=c++11 -pedantic-errors -Wall -Wextra -Wno-long-long $(OPTIMIZATION_OPT)
-LINKER_OPTS      = -lstdc++ -lm
+OPTIONS          =  -Isrc/schifra -Isrc/ -ansi -std=c++17 -pedantic-errors -Wall -Wextra -Wno-long-long $(OPTIMIZATION_OPT)
+LINKER_OPTS      = -lstdc++ -lm -lstdc++fs
 
 BUILD_LIST+=ltarchiver_store
 BUILD_LIST+=ltarchiver_restore
