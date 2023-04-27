@@ -11,19 +11,19 @@
 namespace ltarchiver
 {
     /* Finite Field Parameters */
-    const std::size_t field_descriptor                =   8;
-    const std::size_t generator_polynomial_index      = 120;
-    const std::size_t generator_polynomial_root_count =  32;
+    const std::size_t field_descriptor                =  8; // Field size = 2^field_descriptor - 1
+    const std::size_t generator_polynomial_index      = 120; // Must be smaller than field size
+    const std::size_t generator_polynomial_root_count =  2; // Plus index must be smaller than field size
 
     /* Reed Solomon Code Parameters */
-    const std::size_t code_length = 255;
-    const std::size_t fec_length  =  32;
+    const std::size_t code_length = 255; // Must be the same as field size
+    const std::size_t fec_length  =  2;
     const std::size_t data_length = code_length - fec_length;
     /* Instantiate Finite Field and Generator Polynomials */
     const schifra::galois::field field(field_descriptor,
                                       schifra::galois::primitive_polynomial_size06,
                                       schifra::galois::primitive_polynomial06);
-    schifra::galois::field_polynomial generator_polynomial(field);
+    schifra::galois::field_polynomial generator_polynomial(field); // The alpha that generates all elements of the field
     typedef schifra::reed_solomon::encoder<code_length, fec_length, data_length> encoder_t;
     typedef schifra::reed_solomon::decoder<ltarchiver::code_length, ltarchiver::fec_length, ltarchiver::data_length> decoder_t;
 
