@@ -1,4 +1,4 @@
-COMPILER         = -c++
+COMPILER         = zig c++
 OPTIMIZATION_OPT = -O3
 OPTIONS          =  -Isrc/schifra -Isrc/ -ansi -std=c++17 -pedantic-errors -Wall -Wextra -Wno-long-long $(OPTIMIZATION_OPT)
 LINKER_OPTS      = -lstdc++ -lm -lstdc++fs
