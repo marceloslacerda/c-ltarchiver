@@ -26,6 +26,7 @@ namespace ltarchiver
     schifra::galois::field_polynomial generator_polynomial(field); // The alpha that generates all elements of the field
     typedef schifra::reed_solomon::encoder<code_length, fec_length, data_length> encoder_t;
     typedef schifra::reed_solomon::decoder<ltarchiver::code_length, ltarchiver::fec_length, ltarchiver::data_length> decoder_t;
+    typedef schifra::reed_solomon::block<ltarchiver::code_length,ltarchiver::fec_length> block_t;
 
     bool make_sequential_root_generator_polinomial() {
         if (

@@ -103,6 +103,17 @@ namespace schifra
             return encode(rsblock);
          }
 
+         inline bool encode(char * data, block_type& rsblock) const
+         {
+            const galois::field_symbol  mask = field_.mask();
+            for (std::size_t i = 0; i < data_length; ++i)
+            {
+               rsblock.data[i] = static_cast<typename block_type::symbol_type>(data[i]) & mask;
+            }
+
+            return encode(rsblock);
+         }
+
       private:
 
          encoder();
