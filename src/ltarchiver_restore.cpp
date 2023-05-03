@@ -12,6 +12,8 @@ int main(int argc, char *argv[])
    char * ecc_buffer = new char[ltarchiver::fec_length];
    std::string buffer_str(ltarchiver::data_length, '\0');
    std::string ecc_buffer_str(ltarchiver::fec_length, '\0');
+   size_t errors_detected = 0;
+   size_t errors_corrected = 0;
 
 
    if (argc != 5) {
@@ -37,7 +39,9 @@ int main(int argc, char *argv[])
    /* Instantiate RS Block For Codec */
    schifra::reed_solomon::block<ltarchiver::code_length, ltarchiver::fec_length> block;
    bool end_of_file = false;
-   std::uintmax_t bytes_read = 0;
+   double bytes_read = 0;
+   double file_size = get_file_size(std::string(argv[1]));
+   uint last_percent = 0;
    std::streamsize last_read = 0;
    while (!end_of_file) {
       block.reset();
@@ -74,6 +78,9 @@ int main(int argc, char *argv[])
          return 1;
       }
 
+      errors_detected += block.errors_detected;
+      errors_corrected += block.errors_corrected;
+
       /*Move the data from the block into the buffers*/
 
       block.data_to_string(buffer_str);
@@ -82,9 +89,16 @@ int main(int argc, char *argv[])
       /* Write buffers to respective files */
       outputFile.write(buffer_str.data(), last_read);
       eccOutputFile.write(ecc_buffer_str.data(), ltarchiver::fec_length);
+      
+      if((bytes_read / file_size)*100 > last_percent) {
+         std::cout << "" << last_percent << "%" << std::endl;
+         last_percent++;
+      }
    }
    
-   std::cout << "Success!" << std::endl;
+   std::cout << "Finished decoding" << std::endl;
+   std::cout << "Errors detected (estimated): " << errors_detected << std::endl;
+   std::cout << "Errors corrected (estimated): " << errors_corrected << std::endl;
    inputFile.close();
    outputFile.flush();
    outputFile.close();
@@ -92,5 +106,6 @@ int main(int argc, char *argv[])
    eccOutputFile.close();
    eccFile.close();
    delete[] buffer;
+   delete[] ecc_buffer;
    return 0;
 }
