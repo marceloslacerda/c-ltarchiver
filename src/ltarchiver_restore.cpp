@@ -75,6 +75,9 @@ int main(int argc, char *argv[])
          std::cerr << "Error - Critical decoding failure! "
                   << "Msg: " << block.error_as_string()  << std::endl;
          std::cerr << "Errors detected: " << block.errors_detected << std::endl;
+         std::cerr << "Position of error on chunk: " << (bytes_read - last_read) << " Bytes read in chunk: " << last_read << std::endl;
+         std::cerr << "Position of the ecc file: " << eccFile.tellg() << std::endl;
+         std::cerr << "Data length: " << ltarchiver::data_length << " Ecc length: " << ltarchiver::fec_length << std::endl;
          return 1;
       }
 
